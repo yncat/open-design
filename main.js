@@ -1,28 +1,113 @@
-//�P���ɒʒm���o�������̃v���O�����B
-var started=false;//�X�^�[�g�{�^����������
-function start(){
-	switch(started){
-		case false:
-			started=true;
-			//���̓�����Đ�������̂ŁA������ƃI�}�W�i�C��������
+﻿//geolocationでそれっぽくする
+var useGeo=true;
+var threshold=0.001;
+//音を出さないとデバッグできないんじゃ
+var snd_cancel=new Audio("cancel.mp3");//位置情報が範囲外に出た音
+var snd_find=new Audio("find.mp3");//どこかの地点に重なった音
+var snd_begin=new Audio("begin.mp3");//スタートアップサウンド
+var xhr= new XMLHttpRequest();//動的にサーバ側と通信したい
+var lat=0.0, lng=0.0;//緯度・傾度をとる
+var connections=[];
+var blind_id;
+var server_addr="server.php"
+
+window.onload=function(){
+if(useGeo) navigator.geolocation.watchPosition(update); //現在位置情報を定期的に監視
+}
+
+function s_start(){
+			//下の動画を再生させるので、ちょっとオマジナイを唱える
+/*とりあえず動画は再生させない
 			var playerWindow = document.getElementById("videoplayer").contentWindow;
 			playerWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
-			//������
-			document.getElementById("start_and_approach").innerHTML="Approach!";
-			break;
-		case true:
-			var btn=document.getElementById("start_and_approach");
-			btn.innerHTML="Approaching!";
-			btn.disabled="true";
-			document.getElementById("notification_area").innerHTML='<font color="red">A person with a white cane is approaching. Be careful.</font>';//�Ƃ肠�����F��������ۂ��B���ہA�����ƂȂ��Ă邩�͒m��Ȃ��B
-			setTimeout("clear_notification();",5000);//���΂炭������ʒm�͏���
-			break;
-		}
+			//唱えた
+動画終了
+*/
+
+			document.getElementById("s_start").innerHTML="Sited: selected";
+			document.getElementById("s_start").disabled="true";
+			document.getElementById("b_start").disabled="true";
+
+//サーバーから監視対象の情報を引っ張る
+connection_update();
+setInterval("connection_update();",20000);
+setInterval("collision_detection();",5000);
+}
+
+function b_start(){
+			document.getElementById("s_start").disabled="true";
+			document.getElementById("b_start").innerHTML="Blind: selected";
+			document.getElementById("b_start").disabled="true";
+//監視対象として登録要請
+	xhr.open("GET",server_addr+"?action=new");//とりあえずうちのサーバになってる
+	xhr.send();
+	xhr.addEventListener("load",function(ev){//結果が返ってきたときにコールバック
+blind_id=xhr.response;
+alert(blind_id);
+	xhr.removeEventListener("load", arguments.callee, false);//次のリクエストでこの関数がコールバックされないように
+});
+setInterval("blind_update();",20000);
+}
+
+function notify(){
+			document.getElementById("notification_area").innerHTML='<font color="red">A person with a white cane is approaching. Be careful.</font>';//とりあえず色をそれっぽく。実際、ちゃんとなってるかは知らない。
+			setTimeout("clear_notification();",5000);//しばらくしたら通知は消す
+}
+
+function connection_update(){//サーバーから監視対象の情報を引っ張る
+alert("connection update");
+	xhr.open("GET",server_addr+"?action=retrieve");//とりあえずうちのサーバになってる
+	xhr.send();
+	xhr.addEventListener("load",function(ev){//結果が返ってきたときにコールバック
+if(xhr.response==""){//空のレスポンスだったら、監視対象がいない
+connections=[];
+}else{//だれかいる
+	var tmp=xhr.response.split("\n");//貰ったデータを、まずは1件1件に分ける
+	for(var i=0;i<tmp.length;i++){//次は値ごとに分けて2次元配列にぶっこむ
+		if(tmp[i]=="") continue;
+		var tmp2=tmp[i].split(",");
+		var array_tmp=[parseFloat(tmp2[1]),parseFloat(tmp2[2]),parseFloat(tmp2[3])];
+		connections[i]=array_tmp;
 	}
+}
+	xhr.removeEventListener("load", arguments.callee, false);//次のリクエストでこの関数がコールバックされないように
+});
+}
 
 function clear_notification(){
 	var button=document.getElementById("start_and_approach");
 	button.innerHTML="Approach!";
 	button.disabled="";
 	document.getElementById("notification_area").innerHTML='';
+}
+
+
+    function update(position){//自分の位置情報が更新されたら
+	lat = position.coords.latitude; //緯度
+	lng = position.coords.longitude; //経度
+document.getElementById("debug_area").innerHTML="<p>"+lat+" "+lng+"</p>";
+}
+
+function collision_detection(){
+var ret=false;
+for(var i=0;i<connections.length;i++){
+alert(connections[i]);
+var rdef=Math.abs(lat-connections[i][0]);
+var ldef=Math.abs(lng-connections[i][1]);
+alert("lat: "+connections[i][0]+", lng: "+connections[i][1]+", value: "+connections[i][2]);
+if(rdef<=threshold && ldef<=threshold){
+ret=true;
+break;
+}
+if(connections[i][2]>=3.0){
+ret=true;
+break;
+}
+}
+if(ret) alert("alert!");
+}
+
+function blind_update(){
+	xhr.open("GET",server_addr+"?action=update&n="+blind_id+"&i="+lat+"&k="+lng);//とりあえずうちのサーバになってる
+	xhr.send();
 }
