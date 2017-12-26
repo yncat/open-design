@@ -1,19 +1,23 @@
 ﻿//geolocationでそれっぽくする
-var useGeo=true;
-var threshold=0.001;
-//音を出さないとデバッグできないんじゃ
+var useGeo=true;//位置情報を使うかどうか
+	var threshold=0.00001;//当たり判定の閾値
+//音を出さないとデバッグできないんじゃ、でも実際は使ってない
 var snd_cancel=new Audio("cancel.mp3");//位置情報が範囲外に出た音
 var snd_find=new Audio("find.mp3");//どこかの地点に重なった音
 var snd_begin=new Audio("begin.mp3");//スタートアップサウンド
+
 var xhr= new XMLHttpRequest();//動的にサーバ側と通信したい
 var lat=0.0, lng=0.0;//緯度・傾度をとる
-var connections=[];
-var blind_id;
-var server_addr="server.php"
 
-window.onload=function(){
+var connections=[];//ブラインドの位置情報
+var blind_id;//自分がブラインドの時にサーバーから発行されるID
+
+var server_addr="server.php"//サーバースクリプトへの相対パス、絶対パスにするとだめ
+//カメラ写すあれの設定
+const medias = {audio : false, video : true},
+      video  = document.getElementById("video");
+navigator.getUserMedia(medias, successCallback, errorCallback);//コールバックは下のほうにある
 if(useGeo) navigator.geolocation.watchPosition(update); //現在位置情報を定期的に監視
-}
 
 function s_start(){
 			//下の動画を再生させるので、ちょっとオマジナイを唱える
@@ -55,7 +59,6 @@ function notify(){
 }
 
 function connection_update(){//サーバーから監視対象の情報を引っ張る
-alert("connection update");
 	xhr.open("GET",server_addr+"?action=retrieve");//とりあえずうちのサーバになってる
 	xhr.send();
 	xhr.addEventListener("load",function(ev){//結果が返ってきたときにコールバック
@@ -91,10 +94,9 @@ document.getElementById("debug_area").innerHTML="<p>"+lat+" "+lng+"</p>";
 function collision_detection(){
 var ret=false;
 for(var i=0;i<connections.length;i++){
-alert(connections[i]);
 var rdef=Math.abs(lat-connections[i][0]);
 var ldef=Math.abs(lng-connections[i][1]);
-alert("lat: "+connections[i][0]+", lng: "+connections[i][1]+", value: "+connections[i][2]);
+alert("緯度の差:"+rdef+" / 経度の差:"+ldef);
 if(rdef<=threshold && ldef<=threshold){
 ret=true;
 break;
@@ -111,3 +113,11 @@ function blind_update(){
 	xhr.open("GET",server_addr+"?action=update&n="+blind_id+"&i="+lat+"&k="+lng);//とりあえずうちのサーバになってる
 	xhr.send();
 }
+
+function successCallback(stream) {
+  video.srcObject = stream;
+};
+
+function errorCallback(err) {
+  alert(err);
+};
