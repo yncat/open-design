@@ -1,0 +1,85 @@
+@charset "UTF-8";
+
+body {
+    margin: 0;
+    background: #CECACA;
+}
+h2{
+    text-align: center;
+    margin: 0px;
+    padding-bottom: 10px;
+}
+
+/*通知表示*/
+#notification_area {
+    text-align: center;
+    font-weight: bold;
+    margin: 0px;
+    padding: 0px;
+}
+
+/*Sitedボタンの見た目ここから*/
+#sited{
+    display: inline-block;
+    width: 140px;
+    height: 300px;
+    text-align: center;
+    vertical-align: middle;
+}
+#s_start{
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    background: #FFF;/*ボタン色*/
+    color: #000;
+    border-bottom: solid 4px #EFEEEE;
+    border-radius: 3px;
+}
+#s_start:active {/*ボタンを押したとき*/
+    -ms-transform: translateY(4px);
+    -webkit-transform: translateY(4px);
+    transform: translateY(4px);/*下に動く*/
+    border-bottom: none;/*線を消す*/
+}
+/*ここまで*/
+
+/*カメラ映像の見た目ここから*/
+#video_area {
+    display: inline-block;
+}
+#video_area #video {
+    height: 300px;
+    width: 375px;
+    margin: 0px auto;
+}
+/*ここまで*/
+
+/*Blindボタンの見た目ここから*/
+#blind{
+    display: inline-block;
+    width: 140px;
+    height: 300px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#b_start{
+    display: inline-block;
+    height: 100px;
+    width: 100px;
+    padding: 0.5em 1em;
+    text-decoration: none;
+    background: #FFF;/*ボタン色*/
+    color: #000;
+    border-bottom: solid 4px #EFEEEE;
+    border-radius: 3px;
+}
+#b_start:active {/*ボタンを押したとき*/
+    -ms-transform: translateY(4px);
+    -webkit-transform: translateY(4px);
+    transform: translateY(4px);/*下に動く*/
+    border-bottom: none;/*線を消す*/
+}
+/*ここまで*/

@@ -2,29 +2,30 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <title>ANTI WALKING VR</title>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
-<h1 align="center">testing</h1>
-<div id="buttons_area">
-<p>
-<button id="s_start" type="button" onclick="s_start();">Sited</button>
-<button id="b_start" type="button" onclick="b_start();">Blind</button>
-</p>
-</div>
+    <h2>Anti Walking VR</h2>
 
-<div id="notification_area">
-<p>このへんにアラートが出る</p>
-</div>
+    <div id="notification_area">
+        Please be careful while using VR!
+    </div>
 
-<div id="video_area">
-  <video id="video" autoplay playsinline></video>
+    <div id="sited">
+        <button id="s_start" type="button" onclick="s_start();">Sited</button>
+    </div>
 
-</div>
+    <div id="video_area">
+        <video id="video" autoplay playsinline></video>
+    </div>
 
-<div id="debug_area">
-</div>
+    <div id="blind">
+        <button id="b_start" type="button" onclick="b_start();">Blind</button>
+    </div>
+    <div id="debug_area">
+    </div>
     <script src="main.js"></script>
 
 </body>

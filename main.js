@@ -14,7 +14,15 @@ var blind_id;//自分がブラインドの時にサーバーから発行され�
 
 var server_addr="server.php"//サーバースクリプトへの相対パス、絶対パスにするとだめ
 //カメラ写すあれの設定
-const medias = {audio : false, video : true},
+//const medias = {audio : false, video : true},
+//リアカメラ用
+
+const medias = {audio : false, video : {
+    facingMode : {
+      exact : "environment"
+    }
+  }},
+
       video  = document.getElementById("video");
 navigator.getUserMedia(medias, successCallback, errorCallback);//コールバックは下のほうにある
 if(useGeo) navigator.geolocation.watchPosition(update); //現在位置情報を定期的に監視
@@ -47,7 +55,6 @@ function b_start(){
 	xhr.send();
 	xhr.addEventListener("load",function(ev){//結果が返ってきたときにコールバック
 blind_id=xhr.response;
-alert(blind_id);
 	xhr.removeEventListener("load", arguments.callee, false);//次のリクエストでこの関数がコールバックされないように
 });
 setInterval("blind_update();",20000);
@@ -88,7 +95,6 @@ function clear_notification(){
     function update(position){//自分の位置情報が更新されたら
 	lat = position.coords.latitude; //緯度
 	lng = position.coords.longitude; //経度
-document.getElementById("debug_area").innerHTML="<p>"+lat+" "+lng+"</p>";
 }
 
 function collision_detection(){
@@ -96,7 +102,6 @@ var ret=false;
 for(var i=0;i<connections.length;i++){
 var rdef=Math.abs(lat-connections[i][0]);
 var ldef=Math.abs(lng-connections[i][1]);
-alert("緯度の差:"+rdef+" / 経度の差:"+ldef);
 if(rdef<=threshold && ldef<=threshold){
 ret=true;
 break;
@@ -106,7 +111,11 @@ ret=true;
 break;
 }
 }
-if(ret) alert("alert!");
+if(ret){
+document.getElementById("notification_area").innerHTML="A blind person is approaching. May be great if you could help if he or she needs.";
+}else{
+document.getElementById("notification_area").innerHTML="";
+}
 }
 
 function blind_update(){
